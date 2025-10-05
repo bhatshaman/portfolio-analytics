@@ -59,7 +59,7 @@
             <tbody>
                 {% for stock in data.stocks %}
                 <tr>
-                    <td>{{ stock['index'] }}</td>
+                    <td>{{ stock['ticker'] }}</td>
                     <td>{{ stock['quantity'] }}</td>
                     <td>{{ stock['price'] }}</td>
                     <td>{{ stock['equity'] }}</td>
@@ -73,7 +73,7 @@
         <!-- Plotly Charts -->
         <script>
             // Portfolio Weights Pie Chart
-            var weight_labels = [{% for stock in data.stocks %}"{{ stock['index'] }}",{% endfor %}];
+            var weight_labels = [{% for stock in data.stocks %}"{{ stock['ticker'] }}",{% endfor %}];
             var weight_values = [{% for stock in data.stocks %}{{ stock['weight'] }},{% endfor %}];
 
             Plotly.newPlot('weights_chart', [{
@@ -83,7 +83,7 @@
             }]);
 
             // Stock Beta Bar Chart
-            var beta_labels = [{% for stock in data.stocks %}"{{ stock['index'] }}",{% endfor %}];
+            var beta_labels = [{% for stock in data.stocks %}"{{ stock['ticker'] }}",{% endfor %}];
             var beta_values = [{% for stock in data.stocks %}{{ stock['beta'] }},{% endfor %}];
 
             Plotly.newPlot('beta_chart', [{

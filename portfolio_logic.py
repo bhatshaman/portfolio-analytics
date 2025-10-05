@@ -49,7 +49,10 @@ def get_portfolio_data():
     cumulative_returns = (portfolio_return + 1).cumprod().to_dict()
 
     # Keep only top 10 holdings by equity
-    top_stocks = stocks.sort_values(by="equity", ascending=False).head(10)
+    top_stocks = stocks.sort_values(by="equity", ascending=False).head(10).reset_index()
+    top_stocks.rename(columns={'index': 'ticker'}, inplace=True)
+
+
 
     return {
         "equity": portfolio["equity"],
