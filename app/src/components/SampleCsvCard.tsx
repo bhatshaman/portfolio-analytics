@@ -1,5 +1,5 @@
 import { Badge, Box, Button, Group, Paper, Stack, Text } from "@mantine/core";
-import { useState } from "react";
+import { usePortfolioUploadStore } from "../store/portfolioUploadStore";
 import type { SampleCsv } from "../types/portfolio";
 
 type SampleCsvCardProps = {
@@ -7,7 +7,8 @@ type SampleCsvCardProps = {
 };
 
 function SampleCsvCard({ sample }: SampleCsvCardProps) {
-  const [loading, setLoading] = useState(false);
+  const { analyzeSampleCsv } = usePortfolioUploadStore();
+
   return (
     <Paper radius="lg" p="lg" withBorder className="sample-card">
       <Stack justify="space-between" h="100%">
@@ -24,12 +25,13 @@ function SampleCsvCard({ sample }: SampleCsvCardProps) {
         </Box>
 
         <Button
-          onClick={() => setLoading(true)}
+          onClick={() => {
+            analyzeSampleCsv(sample);
+          }}
           variant="light"
           radius="xl"
-          loading={loading}
         >
-          Use
+          Analyze
         </Button>
       </Stack>
     </Paper>
