@@ -10,6 +10,15 @@ ANNUAL_TRADING_DAYS = 252
 RISK_FREE_RATE = 0.0423
 
 def get_sector_allocation(portfolio_df):
+    """
+    Calculate allocation per sector
+
+    Args:
+        portfolio_df(DataFrame): Enriched portfolio with weights and individual amounts invested
+
+    Returns:
+        dict: sector and portfolio allocation
+    """
     # get weight per ticker
     total_value = portfolio_df['amount_invested'].sum()
 
