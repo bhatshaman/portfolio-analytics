@@ -33,6 +33,21 @@ def get_sector_allocation(portfolio_df):
 
 
 def get_benchmark_comparison(portfolio_df, daily_return):
+    """
+    Compares portfolio performance against the S&P 500 (SPY) benchmark.
+
+    Args:
+        portfolio_df (DataFrame): Enriched portfolio with weights and amount invested per ticker.
+        daily_return (DataFrame): Daily returns for all tickers including SPY over the past year.
+
+    Returns:
+        dict: {
+            'portfolio_daily_return': Series of cumulative portfolio returns normalized to 1.0,
+            'benchmark_daily_return': Series of cumulative SPY returns normalized to 1.0,
+            'portfolio_alpha': float, excess return of portfolio over benchmark,
+            'tracking_error': float, std dev of return difference between portfolio and benchmark
+        }
+    """
     # calculate the daily and annualized returns of portfolio and the benchmark
     daily_portfolio_returns = get_weighted_portfolio_returns(portfolio_df, daily_return)
     benchmark_return = daily_return['SPY']
@@ -54,6 +69,15 @@ def get_benchmark_comparison(portfolio_df, daily_return):
     }
 
 def get_daily_returns(portfolio_df):
+    """
+    Downloads 1 year of historical daily returns for all portfolio tickers plus SPY.
+
+    Args:
+        portfolio_df (DataFrame): Raw portfolio with at minimum a 'ticker' column.
+
+    Returns:
+        DataFrame: Daily percentage returns per ticker with dates as index, NaN rows dropped.
+    """
     # use yf to get a 365 day history of ticker prices based on current date
     end_time = dt.date.today()
     start_time = end_time - dt.timedelta(days=365)
@@ -67,6 +91,16 @@ def get_daily_returns(portfolio_df):
     return daily_return
 
 def get_weighted_portfolio_returns(portfolio_df, daily_return):
+    """
+    Calculates the daily portfolio return by weighting each ticker's daily return by its portfolio weight.
+
+    Args:
+        portfolio_df (DataFrame): Enriched portfolio with 'ticker' and 'weights' columns.
+        daily_return (DataFrame): Daily returns for all tickers over the past year.
+
+    Returns:
+        Series: Daily weighted portfolio returns with dates as index.
+    """
     # fetch the weights per ticker
     portfolio_df = portfolio_df.sort_values('weights', ascending=False)
     # set weights as the index
@@ -78,6 +112,21 @@ def get_weighted_portfolio_returns(portfolio_df, daily_return):
     
 
 def get_performance(portfolio_df, daily_return):
+    """
+    Calculates portfolio performance metrics over the past year.
+
+    Args:
+        portfolio_df (DataFrame): Enriched portfolio with weights and amount invested per ticker.
+        daily_return (DataFrame): Daily returns for all tickers over the past year.
+
+    Returns:
+        dict: {
+            'cumulative_return_series': Series of cumulative portfolio returns over time,
+            'portfolio_cumulative_return': float, total return over the period,
+            'portfolio_annualized_return': float, annualized return,
+            'daily_pl': Series of daily profit and loss in dollars
+        }
+    """
     # get daily returns of the portfolio
     daily_portfolio_returns = get_weighted_portfolio_returns(portfolio_df, daily_return)
     # find the cumulative return series of the daily returns
@@ -97,6 +146,17 @@ def get_performance(portfolio_df, daily_return):
     }
 
 def get_portfolio_weights(stocks_df):
+    """
+    Enriches the raw portfolio DataFrame with current price, sector, amount invested and portfolio weights.
+    Fetches live data from yfinance for each ticker.
+
+    Args:
+        stocks_df (DataFrame): Raw portfolio with columns: ticker, quantity, avg_buy_price.
+
+    Returns:
+        DataFrame: Enriched portfolio with additional columns:
+                   sector, current_price, amount_invested, weights.
+    """
     # get the current price and sector of each ticker, assign ETF if no sector
     cp = []
     for ticker in stocks_df['ticker']:
@@ -120,6 +180,22 @@ def get_portfolio_weights(stocks_df):
     return portfolio_df
 
 def get_risk_metrics(portfolio_df, daily_return):
+    """
+    Calculates key risk metrics for the portfolio.
+
+    Args:
+        portfolio_df (DataFrame): Enriched portfolio with weights and amount invested per ticker.
+        daily_return (DataFrame): Daily returns for all tickers over the past year.
+
+    Returns:
+        dict: {
+            'portfolio_sharpe_ratio': float, annualized Sharpe ratio using risk-free rate,
+            'portfolio_sortino_ratio': float, annualized Sortino ratio using downside deviation,
+            'portfolio_var': float, Value at Risk at 95% confidence (daily),
+            'portfolio_cvar': float, Conditional VaR — average loss beyond VaR threshold,
+            'portfolio_max_drawdown': float, largest peak-to-trough decline over the period
+        }
+    """
     # calculate sharpe ratio
     daily_portfolio_returns = get_weighted_portfolio_returns(portfolio_df, daily_return)
     cumulative_return_portfolio_series = (1 + daily_portfolio_returns).cumprod()
