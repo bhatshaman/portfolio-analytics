@@ -29,7 +29,6 @@ Portfolio Analytics is a full-stack financial analytics tool that allows investo
 |---|---|
 | Backend | Python, Flask |
 | Frontend | React |
-| Database | PostgreSQL |
 | Financial Data | yfinance |
 | Data Processing | pandas, NumPy |
 
